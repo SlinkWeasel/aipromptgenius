@@ -3,12 +3,15 @@
 import { useState, useMemo } from 'react';
 import PromptCard from '@/components/PromptCard';
 import CategoryCard from '@/components/CategoryCard';
+import Navbar from '@/components/Navbar';
+import EmailSignup from '@/components/EmailSignup';
 import { categories, prompts, getFeaturedPrompts, getTrendingPrompts, getPromptsByCategory } from '@/data/prompts';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const featuredPrompts = getFeaturedPrompts();
   const trendingPrompts = getTrendingPrompts();
+  const currentYear = new Date().getFullYear();
 
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return null;
@@ -29,40 +32,26 @@ export default function Home() {
     return counts;
   }, []);
 
-  const currentYear = new Date().getFullYear();
-
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
+      <Navbar />
+
       <section className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            AI Prompt Genius
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-indigo-100">
-            Tested, proven AI prompts that actually work
-          </p>
+          <h1 className="text-5xl md:text-6xl font-bold mb-6">AI Prompt Genius</h1>
+          <p className="text-xl md:text-2xl mb-8 text-indigo-100">Tested, proven AI prompts that actually work</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="#categories"
-              className="bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
-            >
+            <a href="#categories" className="bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors">
               Browse Categories
             </a>
-            <a
-              href="#featured"
-              className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white/10 transition-colors"
-            >
-              View Featured
+            <a href="#email-signup" className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white/10 transition-colors">
+              Get Weekly Prompts
             </a>
           </div>
-          <p className="mt-8 text-sm text-indigo-200">
-            {prompts.length}+ curated prompts for ChatGPT, Claude, Midjourney &amp; more
-          </p>
+          <p className="mt-8 text-sm text-indigo-200">{prompts.length}+ curated prompts for ChatGPT, Claude, Midjourney &amp; more</p>
         </div>
       </section>
 
-      {/* Search Section */}
       <section className="py-8 px-4 bg-white border-b">
         <div className="max-w-2xl mx-auto">
           <div className="relative">
@@ -70,15 +59,11 @@ export default function Home() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search prompts... (e.g., 'email', 'coding', 'marketing')"
+              placeholder="Search prompts... (e.g. email, coding, marketing)"
               className="w-full px-6 py-4 rounded-full border-2 border-gray-200 focus:border-indigo-500 focus:outline-none text-lg"
             />
             {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 px-3 py-2 text-xl"
-                aria-label="Clear search"
-              >
+              <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 px-3 py-2 text-xl">
                 ×
               </button>
             )}
@@ -86,115 +71,60 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Search Results */}
       {searchResults !== null && (
         <section className="py-10 px-4 bg-indigo-50 border-b">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-2xl font-bold mb-2 text-gray-900">
               {searchResults.length > 0
-                ? `${searchResults.length} result${searchResults.length === 1 ? '' : 's'} for "${searchQuery}"`
+                ? `${searchResults.length} result${searchResults.length === 1 ? '' : 's'}`
                 : `No results for "${searchQuery}"`}
             </h2>
             {searchResults.length === 0 && (
-              <p className="text-gray-500 mb-6">Try searching for a category like "writing", "coding", or a use case like "email" or "debug".</p>
+              <p className="text-gray-500 mb-6">Try searching for a category like writing or coding, or a use case like email or debug.</p>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-              {searchResults.map((prompt) => (
-                <PromptCard key={prompt.id} prompt={prompt} />
-              ))}
+              {searchResults.map((prompt) => (<PromptCard key={prompt.id} prompt={prompt} />))}
             </div>
           </div>
         </section>
       )}
 
-      {/* Categories Section */}
       <section id="categories" className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
-            Browse by Category
-          </h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">Browse by Category</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category) => (
-              <CategoryCard
-                key={category.id}
-                id={category.id}
-                name={category.name}
-                icon={category.icon}
-                description={category.description}
-                promptCount={promptCountByCategory[category.id] ?? 0}
-              />
+              <CategoryCard key={category.id} id={category.id} name={category.name} icon={category.icon} description={category.description} promptCount={promptCountByCategory[category.id] ?? 0} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Prompts Section */}
       <section id="featured" className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4 text-gray-900">
-            Featured Prompts
-          </h2>
-          <p className="text-center text-gray-600 mb-12">
-            Hand-picked prompts that deliver results
-          </p>
+          <h2 className="text-3xl font-bold text-center mb-4 text-gray-900">Featured Prompts</h2>
+          <p className="text-center text-gray-600 mb-12">Hand-picked prompts that deliver results</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredPrompts.map((prompt) => (
-              <PromptCard key={prompt.id} prompt={prompt} />
-            ))}
+            {featuredPrompts.map((prompt) => (<PromptCard key={prompt.id} prompt={prompt} />))}
           </div>
         </div>
       </section>
 
-      {/* Trending Section */}
       <section className="py-16 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4 text-gray-900">
-            Trending This Week
-          </h2>
-          <p className="text-center text-gray-600 mb-12">
-            Most popular prompts right now
-          </p>
+          <h2 className="text-3xl font-bold text-center mb-4 text-gray-900">Trending This Week</h2>
+          <p className="text-center text-gray-600 mb-12">Most popular prompts right now</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {trendingPrompts.map((prompt) => (
-              <PromptCard key={prompt.id} prompt={prompt} />
-            ))}
+            {trendingPrompts.map((prompt) => (<PromptCard key={prompt.id} prompt={prompt} />))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 bg-indigo-900 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Never struggle with AI prompts again
-          </h2>
-          <p className="text-xl mb-8 text-indigo-200">
-            Get unlimited access to 1000+ tested prompts for just $9.99/month
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="#categories"
-              className="bg-white text-indigo-900 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Get Premium Access
-            </a>
-            <a
-              href="#featured"
-              className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white/10 transition-colors"
-            >
-              View Free Prompts
-            </a>
-          </div>
-          <p className="mt-6 text-sm text-indigo-300">
-            {prompts.length}+ free prompts • New prompts weekly • Cancel anytime
-          </p>
-        </div>
-      </section>
+      <EmailSignup />
 
-      {/* Footer */}
       <footer className="py-12 px-4 bg-gray-900 text-gray-400">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
               <h3 className="text-white font-semibold mb-4">AI Prompt Genius</h3>
               <p className="text-sm">Curated AI prompts that actually work. Tested and proven.</p>
@@ -203,28 +133,15 @@ export default function Home() {
               <h4 className="text-white font-semibold mb-4">Categories</h4>
               <ul className="space-y-2 text-sm">
                 {categories.slice(0, 4).map((cat) => (
-                  <li key={cat.id}>
-                    <a href={`/categories/${cat.id}`} className="hover:text-white transition-colors">
-                      {cat.name}
-                    </a>
-                  </li>
+                  <li key={cat.id}><a href={`/categories/${cat.id}`} className="hover:text-white transition-colors">{cat.name}</a></li>
                 ))}
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Resources</h4>
+              <h4 className="text-white font-semibold mb-4">Contact</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#featured" className="hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#categories" className="hover:text-white transition-colors">Prompt Guide</a></li>
-                <li><a href="#cta" className="hover:text-white transition-colors">Newsletter</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Connect</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="https://x.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Twitter/X</a></li>
-                <li><a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Discord</a></li>
-                <li><a href="mailto:hello@aipromptgenius.com" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="mailto:hello@aipromptgenius.com" className="hover:text-white transition-colors">hello@aipromptgenius.com</a></li>
+                <li><a href="#email-signup" className="hover:text-white transition-colors">Newsletter</a></li>
               </ul>
             </div>
           </div>
